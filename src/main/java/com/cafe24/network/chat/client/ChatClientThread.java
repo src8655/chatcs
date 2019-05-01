@@ -26,7 +26,7 @@ public class ChatClientThread extends Thread {
 				client.updateJText(iMessage);	//JTextPane 업데이트
 			}
 		} catch (IOException e) {
-			e.printStackTrace();
+			client.updateJText("서버와 연결이 끊어졌습니다.");
 		}
 	}
 

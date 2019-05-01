@@ -55,7 +55,8 @@ public class ChatServerThread extends Thread {
 		nickname = new String(Base64.getDecoder().decode(nickname.getBytes("UTF-8")),"utf-8");
 		this.nickname = nickname;
 		String msg = encode(nickname+"님이 입장 하였습니다.");
-		server.broadCast(msg);
+		server.broadCastJoin(msg, this);		//본인 제외 다른사람들한테만 보내기
+		send(encode("접속완료 즐거운 채팅 하세요"));		//본인한테만 보내기
 	}
 	//메시지(message) 명령어
 	public void doMessage(String message) throws IOException {

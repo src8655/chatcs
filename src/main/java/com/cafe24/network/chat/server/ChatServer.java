@@ -29,8 +29,7 @@ public class ChatServer extends Thread {
 				//연결을 기다린다
 				serverLog("연결 대기중(" + PORT + ")...");
 				Socket socket = serverSocket.accept();
-				//socket.getInetAddress().
-				serverLog("연결 성공...");
+				serverLog("연결 성공(" + socket.getPort() + ")...");
 				
 				
 				ChatServerThread chatServerThread = new ChatServerThread(this, socket);	//스레드객체에 클라이언트 소켓을 전달
@@ -46,6 +45,14 @@ public class ChatServer extends Thread {
 		synchronized(socketThreadList) {
 			for(ChatServerThread ct : socketThreadList){
 				ct.send(msg);
+	        }
+		}
+	}
+	//join 메시지 띄우기(본인 제외한 다른사람들에게 보내기)
+	public void broadCastJoin(String msg, ChatServerThread chatServerThread) throws IOException {
+		synchronized(socketThreadList) {
+			for(ChatServerThread ct : socketThreadList){
+				if(ct != chatServerThread) ct.send(msg);
 	        }
 		}
 	}
