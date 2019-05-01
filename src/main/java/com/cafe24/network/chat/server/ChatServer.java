@@ -37,6 +37,13 @@ public class ChatServer extends Thread {
 				chatServerThread.start();												//스레드시작
 			}
 		} catch (IOException e) {e.printStackTrace();}
+		finally {
+			try {
+				if(serverSocket != null && !serverSocket.isClosed()) serverSocket.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			} 
+		}
 	}
 	
 
@@ -63,7 +70,7 @@ public class ChatServer extends Thread {
 			serverLog("연결소켓 리스트(" + socketThreadList.size() + ")");
 		}
 	}
-	//연결 해제된 소켓 리스트에 제거
+	//연결 해제된 소켓 리스트에서 제거
 	public void removeSocketThreadList(ChatServerThread chatServerThread) {
 		synchronized(socketThreadList) {
 			socketThreadList.remove(chatServerThread);
