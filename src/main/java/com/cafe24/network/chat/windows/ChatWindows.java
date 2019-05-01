@@ -51,6 +51,7 @@ public class ChatWindows extends JFrame {
 		btn_in.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
+				//공백이 아닐때만 닉네임으로 인정
 				String nickname = text_NameInput.getText();
 				if(!"".equals(nickname)) {
 					ChatClient chatClient = new ChatClient(nickname);
