@@ -14,8 +14,8 @@ import com.cafe24.network.chat.windows.ChatClientWindows;
 
 
 public class ChatClient extends Thread {
-	private static final String SERVER_IP = "127.0.0.1";
-	private static final int SERVER_PORT = 9696;
+	private String server_ip = "1.0.0.1";
+	private int server_port = -1;
 
     BufferedReader r = null;
 	PrintWriter pr = null;
@@ -31,8 +31,10 @@ public class ChatClient extends Thread {
 	public String[] arrayId = null;
 	
 	//닉네임 저장 생성자
-	public ChatClient(String nickname) {
+	public ChatClient(String nickname, String server_ip, int server_port) {
 		this.nickname = nickname;
+		this.server_ip = server_ip;
+		this.server_port = server_port;
 	}
 	
 	public void run() {
@@ -42,7 +44,7 @@ public class ChatClient extends Thread {
 	    try {
 	    	clientLog("접속 대기중...");
 			socket = new Socket();
-			socket.connect(new InetSocketAddress(SERVER_IP, SERVER_PORT));
+			socket.connect(new InetSocketAddress(server_ip, server_port));
 
 			r = new BufferedReader(new InputStreamReader(socket.getInputStream(), "utf-8"));
 			pr = new PrintWriter(new OutputStreamWriter(socket.getOutputStream(), "utf-8"), true);

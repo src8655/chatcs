@@ -13,12 +13,16 @@ import java.util.Set;
 import com.cafe24.network.chat.windows.ChatServerWindows;
 
 public class ChatServer extends Thread {
-	private static final int PORT = 9696;
+	private int port = 9696;
 
 	HashMap<Long, ChatServerThread> socketThreadMap = null;
 	ServerSocket serverSocket = null;
 	
 	ChatServerWindows chatServerWindows = null;
+	
+	public ChatServer(int port) {
+		this.port = port;
+	}
 
 	public void run() {
 		//윈도우창 오픈
@@ -27,11 +31,11 @@ public class ChatServer extends Thread {
 		try {
 			socketThreadMap = new HashMap<Long, ChatServerThread>();	//연결된 목록을 저장하는 맵
 			serverSocket = new ServerSocket();							//서버소켓생성
-			serverSocket.bind(new InetSocketAddress("0.0.0.0", PORT));	//아이피+포트설정
+			serverSocket.bind(new InetSocketAddress("0.0.0.0", port));	//아이피+포트설정
 		
 			while(true) {
 				//연결을 기다린다
-				serverLog("연결 대기중(" + PORT + ")...");
+				serverLog("연결 대기중(" + port + ")...");
 				Socket socket = serverSocket.accept();
 				serverLog("연결 성공(" + socket.getPort() + ")...");
 				

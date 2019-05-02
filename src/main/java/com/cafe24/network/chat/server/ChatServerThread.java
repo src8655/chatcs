@@ -45,7 +45,8 @@ public class ChatServerThread extends Thread {
 				else if("quit".equals(tokens[0])) doQuit();
 			}
 		} catch (IOException e) {
-			e.printStackTrace();
+			//e.printStackTrace();
+			doQuit();
 		}
 	}
 	
