@@ -26,6 +26,9 @@ public class ChatClient extends Thread {
 
 	String nickname = null;
 	boolean endflag = false;	//종료플래그
+
+	public String[] arrayNickname = null;
+	public String[] arrayId = null;
 	
 	//닉네임 저장 생성자
 	public ChatClient(String nickname) {
@@ -54,13 +57,14 @@ public class ChatClient extends Thread {
 			//종료되지 않게 반복
 			while(!endflag) {}
 		} catch (IOException e) {
-			e.printStackTrace();
+			updateJText("서버에 연결할 수 없음.");
+			//e.printStackTrace();
 		}
 	}
 	//종료시 정리
 	public void doQuit() {
 		sendToServer("quit"," ");		//종료신호 보내기
-		chatClientThread.stop();		//스레드종료
+		if(chatClientThread != null) chatClientThread.stop();		//스레드종료
 		
 		//소켓닫기
 		try {
@@ -73,11 +77,11 @@ public class ChatClient extends Thread {
 		endflag = true;	//종료플래그
 	}
 	//서버로 전송
-	public void sendToServer(String command, String msg) {
+	public void sendToServer(String command, String msg)  {
 		try {
 			//인코드해서 보냄
 			msg = new String(Base64.getEncoder().encode(msg.getBytes("UTF-8")), "UTF-8");
-			pr.println(command + ":" + msg);
+			if(pr != null) pr.println(command + ":" + msg);
 		} catch (UnsupportedEncodingException e) {
 			e.printStackTrace();
 		}
@@ -89,6 +93,24 @@ public class ChatClient extends Thread {
 	//클라이언트 로그 찍기
 	public static void clientLog(String msg) {
 		System.out.println("[Client] " + msg);
+	}
+	//받아온 멤버리스트 저장하기
+	public void setArrayNickname(String msg) {
+		String[] list = msg.split("/");		//리스트파싱
+		int size = list.length;				//리스트개수 파악
+		
+		arrayNickname = new String[size];	//사이즈만큼 배열 설정
+		arrayId = new String[size];
+		
+		//하나씩 분리해서 넣기
+		for(int i=0;i<size;i++) {
+			String[] tokens = list[i].split(":");
+			arrayId[i] = tokens[0];
+			arrayNickname[i] = tokens[1];
+		}
+		
+		//리스트에 반영
+		chatClientWindows.updateJList(arrayNickname);
 	}
 
 }

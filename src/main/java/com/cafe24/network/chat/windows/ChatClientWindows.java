@@ -1,15 +1,23 @@
 package com.cafe24.network.chat.windows;
 
 import java.awt.BorderLayout;
+import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 
+import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JFrame;
+import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
@@ -23,12 +31,15 @@ public class ChatClientWindows extends JFrame {
 	JTextArea messages = null;
 	JTextField msg_input = null;
 	JScrollPane scrollpane = null;
+	JScrollPane scrollpane2 = null;
+	JList<String> jlist = null;
+	
 
 	public ChatClientWindows(ChatClient chatClient, String nickname) {
 		this.chatClient = chatClient;
 		
 		setTitle(nickname + ":: 채팅 클라이언트");
-		setBounds(100, 200, 300, 200);
+		setBounds(100, 200, 350, 200);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		
 		JPanel panel = new JPanel();
@@ -53,9 +64,17 @@ public class ChatClientWindows extends JFrame {
 		panel2.add(msg_input, BorderLayout.CENTER);
 		panel2.add(send_btn, BorderLayout.LINE_END);
 		
-
+		//접속자 리스트
+		jlist = new JList<String>();
+		scrollpane2 = new JScrollPane();
+		scrollpane2.setViewportView(jlist);
+		scrollpane2.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+		scrollpane2.setPreferredSize(new Dimension(80, jlist.getHeight()));
+		
+		
 		panel.add(scrollpane, BorderLayout.CENTER);
 		panel.add(panel2, BorderLayout.PAGE_END);
+		panel.add(scrollpane2, BorderLayout.LINE_END);
 		
 		//보내기버튼 리스너
 		send_btn.addActionListener(new ActionListener() {
@@ -94,15 +113,45 @@ public class ChatClientWindows extends JFrame {
 				chatClient.doQuit();
 			}
 		});
+		//더블클릭 시 귓속말
+		jlist.addMouseListener(new MouseListener() {
+			public void mouseReleased(MouseEvent e) {}
+			public void mousePressed(MouseEvent e) {}
+			public void mouseExited(MouseEvent e) {}
+			public void mouseEntered(MouseEvent e) {}
+			public void mouseClicked(MouseEvent e) {
+				JList<String> list = (JList<String>)e.getSource();
+				
+				//더블클릭 시
+				if(e.getClickCount() == 2) {
+					//선택한 이름과 스레드id를 찾는다
+					int index = list.locationToIndex(e.getPoint());
+					String tmp_NickName = chatClient.arrayNickname[index];
+					String tmp_Id = chatClient.arrayId[index];
+					updateJTextField("To." + tmp_NickName + "(" + tmp_Id + "):");	//입력창 수정
+				}
+			}
+		});
 		
 		
 		add(panel);
 		setVisible(true);
+		
+		
 	}
 
 	//JTextPane 업데이트
 	public void updateJText(String msg) {
 		messages.setText(messages.getText() + msg + "\n");
 		messages.setCaretPosition(messages.getDocument().getLength());
+	}
+	//사용자 리스트 업데이트
+	public void updateJList(String[] list) {
+		jlist.setListData(list);
+		scrollpane2.setPreferredSize(new Dimension(80, jlist.getHeight()));
+	}
+	//입력창 수정
+	public void updateJTextField(String msg) {
+		msg_input.setText(msg);
 	}
 }

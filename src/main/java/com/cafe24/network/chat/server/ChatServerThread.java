@@ -55,15 +55,46 @@ public class ChatServerThread extends Thread {
 		nickname = new String(Base64.getDecoder().decode(nickname.getBytes("UTF-8")),"utf-8");
 		this.nickname = nickname;
 		String msg = encode(nickname+"님이 입장 하였습니다.");
-		server.broadCastJoin(msg, this);		//본인 제외 다른사람들한테만 보내기
-		send(encode("접속완료 즐거운 채팅 하세요"));		//본인한테만 보내기
+		server.broadCastJoin(msg, this.getId());		//본인 제외 다른사람들한테만 보내기
+		send(encode("접속완료 즐거운 채팅 되세요"));		//본인한테만 보내기
 	}
 	//메시지(message) 명령어
 	public void doMessage(String message) throws IOException {
-		//디코드
-		message = new String(Base64.getDecoder().decode(message.getBytes("UTF-8")),"utf-8");
-		String msg = encode(nickname + " : " + message);
-		server.broadCast(msg);
+		message = decode(message);	//디코드
+		
+		//귓속말인지 확인(To.로 시작하는 메시지인지 확인)
+		if(message.matches("To.*")) {
+			message = message.split("To.")[1];	//To제거
+			
+			//받는사람 정보
+			String tmp_NickName = "";
+			Long tmp_Id = 0L;
+			
+			String[] tmp = null;
+			
+			tmp = message.split("\\(");
+			if(tmp.length < 2) return;
+			
+			tmp_NickName = tmp[0];
+			message = tmp[1];
+			
+			tmp = message.split("\\):");
+			if(tmp.length < 1) return;
+			try {
+				tmp_Id = Long.parseLong(tmp[0]);
+			}catch(Exception e) {
+				return;
+			}
+			if(tmp.length < 2) 
+				message = " ";
+			else message = tmp[1];
+			
+			server.broadCastSecret(this.nickname, this.getId(), message, tmp_NickName, tmp_Id);
+		}else {
+			//귓속말이 아닐 때 전체방송
+			String msg = encode(nickname + " : " + message);
+			server.broadCast(msg);
+		}
 	}
 	//종료(quit) 명령어
 	public void doQuit() {
